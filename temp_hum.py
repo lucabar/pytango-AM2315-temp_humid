@@ -30,9 +30,9 @@ class TempHum(Device):
         self.humid = 0
 
     @command(polling_period=500)
-    def read_data(self):
-        print("read data")
-        self.am2315.get_data()
+    def get_data(self):
+        print("get data")
+        self.am2315._read_data()
         
         
     def get_temperature(self):
