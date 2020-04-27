@@ -33,6 +33,7 @@ class TempHum(Device):
     def get_data(self):
         print("get data")
         self.am2315._read_data()
+        print(self.am2315.temp)
         
         
     def get_temperature(self):
