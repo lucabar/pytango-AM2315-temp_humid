@@ -17,10 +17,10 @@ import AM2315 as am_driver
 class TempHum(Device):
     
     temperature = attribute(access=AttrWriteType.READ,
-                            fget='get_temperature', polling_period=500)
+                            fget='get_temperature')
     
     humidity = attribute(access=AttrWriteType.READ,
-                        fget='get_humidity', )
+                        fget='get_humidity')
     
     def init_device(self):
         Device.init_device(self)
@@ -30,16 +30,16 @@ class TempHum(Device):
         self.humid = 0
 
     @command(polling_period=500)
-    def get_data(self):
-        print("get data")
-        self.temp = self.am2315.read_temperature()
-        self.humid = self.am2315.read_humidity()
+    def read_data(self):
+        print("read data")
+        self.am2315.get_data()
+        
         
     def get_temperature(self):
-        return self.temp
+        return self.am2315.temp
     
     def get_humidity(self):
-        return self.humid
+        return self.am2315.humid
         
 
     
