@@ -26,15 +26,11 @@ class TempHum(Device):
         Device.init_device(self)
         self.am2315 = am_driver.AM2315()
         self.set_state(DevState.ON)
-        self.temp = 0
-        self.humid = 0
 
     @command(polling_period=500)
     def get_data(self):
         print("get data")
         self.am2315._read_data()
-        print(self.am2315.temperature)
-        
         
     def get_temperature(self):
         return self.am2315.temperature
@@ -42,8 +38,6 @@ class TempHum(Device):
     def get_humidity(self):
         return self.am2315.humidity
         
-
-    
     def read_state(self):
         return self.state()
 
