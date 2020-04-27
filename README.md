@@ -1,1 +1,1 @@
-# -lucabar-pytango-AM2315-temp_humid-
+# Pytango AM2315 Tango Device Server
