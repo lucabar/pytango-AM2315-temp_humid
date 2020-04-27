@@ -9,7 +9,6 @@
 
 """
 
-#import time 
 import numpy
 from tango import AttrWriteType, DevState
 from tango.server import Device, attribute, command
@@ -46,30 +45,6 @@ class TempHum(Device):
     
     def read_state(self):
         return self.state()
-    
-    @command
-    def TurnOn(self):
-        # turn on the sensor here
-        self.set_state(DevState.ON)
-        
-    @command
-    def TurnOff(self):
-        # turn off
-        self.set_state(DevState.OFF)
-        
-    @command
-    def StandBy(self):
-        #reset the state to standby
-        self.set_state(DevState.STANDBY)
-    
-    ''' 
-    @command
-    def Use(self):
-        if str(Device.get_state(self)) == 'ON':
-            print('working..')
-        else:
-            print('Cannot start process, because device is',
-                   Device.get_state(self))
-    '''
+
 if __name__ == "__main__":
     TempHum.run_server()
