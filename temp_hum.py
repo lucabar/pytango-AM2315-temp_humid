@@ -11,6 +11,7 @@
 
 import numpy
 from tango import AttrWriteType, DevState
+from tango import InfoIt, LogIt, DebugIt
 from tango.server import Device, attribute, command
 import AM2315 as am_driver
 
@@ -26,17 +27,26 @@ class TempHum(Device):
         Device.init_device(self)
         self.am2315 = am_driver.AM2315()
         self.set_state(DevState.ON)
+        self.temp = 0
+        self.humid = 0
         
-    @tango.InfoIt()
+     
     @command(polling_period=500)
     def get_data(self):
+        #print('one')
+        #_read_data measures both humidity and temperature
         self.am2315._read_data()
+        self.temp = self.am2315.temperature
+        self.humid = self.am2315.humidity
         
+        
+    @LogIt(show_ret=True)   
     def get_temperature(self):
-        return self.am2315.temperature
+        return self.temp
+    
     
     def get_humidity(self):
-        return self.am2315.humidity
+        return self.humid
         
     def read_state(self):
         return self.state()
