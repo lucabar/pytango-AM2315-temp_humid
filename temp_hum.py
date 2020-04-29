@@ -26,10 +26,10 @@ class TempHum(Device):
         Device.init_device(self)
         self.am2315 = am_driver.AM2315()
         self.set_state(DevState.ON)
-
+        
+    @tango.InfoIt()
     @command(polling_period=500)
     def get_data(self):
-        print("get data")
         self.am2315._read_data()
         
     def get_temperature(self):
