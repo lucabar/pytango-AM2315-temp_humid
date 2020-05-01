@@ -32,11 +32,12 @@ class TempHum(Device):
             self.set_state(DevState.ON)
             self.temp = 0
             self.humid = 0
+            self.info_stream("conenction established")
             
         except:
             return('There was no AM2315-Device found.')
         
-    @WarnIt()            
+    @DebugIt()            
     @command(polling_period=500)
     def get_data(self):
         #_read_data measures both humidity and temperature
@@ -44,11 +45,11 @@ class TempHum(Device):
         self.temp = self.am2315.temperature
         self.humid = self.am2315.humidity
         
-    @DebugIt(show_ret=True)               
+    @InfoIt(show_ret=True)               
     def get_temperature(self):
         return self.temp
     
-    @DebugIt(show_ret=True)    
+    @InfoIt(show_ret=True)    
     def get_humidity(self):
         return self.humid   
 
