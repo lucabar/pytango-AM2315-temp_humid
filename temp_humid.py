@@ -13,7 +13,7 @@ import numpy
 from tango import AttrWriteType, DevState, ErrorIt, FatalIt
 from tango import LogIt, DebugIt, InfoIt, WarnIt
 from tango.server import Device, attribute, command
-import AM2315 as am_driver
+import adafruit_am2320 as am_driver
 
 class TempHumid(Device):
     
@@ -29,7 +29,7 @@ class TempHumid(Device):
         self.info_stream('Trying to connect device to server.')
         try:
             Device.init_device(self)
-            self.am2315 = am_driver.AM2315()
+            self.am2315 = am_driver.AM2320()
             self.set_state(DevState.ON)
             self.temp = 0
             self.humid = 0
@@ -41,8 +41,6 @@ class TempHumid(Device):
     @DebugIt()            
     @command()
     def get_data(self):
-        #_read_data measures both humidity and temperature
-        self.am2315._read_data()
         self.temp = self.am2315.temperature
         self.humid = self.am2315.humidity
         
