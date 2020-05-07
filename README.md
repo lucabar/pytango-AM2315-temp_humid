@@ -1,7 +1,9 @@
 # PyTango AM2315 Tango Device Server
-This repository holds a Tango Device Server for the <a href = "https://www.adafruit.com/products/1293">AM2315 temperature and humidity sensor</a> and a quick tutorial on how it was written and what will be needed to get the Server running. I am working on a Raspberry Pi 4 with PyTango 9.2.5 (without database) but this tutorial should work with any hardware supporting an i2c bus. How to hook up the AM2315 to a Rapsi or another Arduino is shown <a href="https://cdn-learn.adafruit.com/downloads/pdf/am2315-encased-i2c-temperature-humidity-sensor.pdf?timestamp=1588759334">here</a>. <bar>
+Content: <a href="#install_driver">Installing AM2315 driver</a>, <a href="#register_TDS">Registering TangoDS</a>, <a href="#connect_db">Connecting Databases</a>, <a href="#write_TDS">Writing TangoDS</a>, <a href="#run_TDS">Running TangoDS</a>.
 
-## Installing the AM2315 driver
+This repository holds a Tango Device Server for the <a href = "https://www.adafruit.com/products/1293">AM2315 temperature and humidity sensor</a> and a quick tutorial on how it was written and what will be needed to get the Server running. I am working on a Raspberry Pi 4 with PyTango 9.2.5 (without database) but this tutorial should work with any hardware supporting an i2c bus. How to hook up the AM2315 to a Rapsi or another Arduino is shown <a href="https://cdn-learn.adafruit.com/downloads/pdf/am2315-encased-i2c-temperature-humidity-sensor.pdf?timestamp=1588759334">here</a>.  
+
+## <a name="install_driver">Installing AM2315 driver</a>
 Start by installing the <a href="https://github.com/adafruit/Adafruit_Blinka">Adafruit_Blinka library</a> that enables CircuitPython support and the <a href="https://github.com/adafruit/Adafruit_CircuitPython_AM2320">Adafruit CircuitPython AM2320 library</a> (there is so far only a C++ library for the AM23<b>15</b> whereas the AM23<b>20</b> Python library works just as well for our AM2315):
 
 <pre>
@@ -14,7 +16,7 @@ Now you should be able to <code class="code-colors inline">import adafruit_am232
 ## Registering the TangoDS and connecting databases
 Because you will want to run and debug your Server while writing it, you first need to register it with the Tango Database. To register it on your hardware (here a Raspi), you have to point your TANGO_HOST-name to the database address on your main computer where the Tango database is installed. In case you have already done that you can skip the next abstract.
 
-### Pointing to the main database
+### <a name="connect_db">Pointing to the main database</a>
 To give your Raspi (or other) access to the main data base you have to change two files:
 
 <ul type="circle">
@@ -22,7 +24,7 @@ To give your Raspi (or other) access to the main data base you have to change tw
     <li>~/.profile – paste the following at the end of the file: "export TANGO_HOST=my_tango_host"</li>
 </ul>
 
-### Registering TangoDS
+### <a name="register_TDS">Registering TangoDS</a>
 You will probably know from the <a href="https://pytango.readthedocs.io/en/stable/quicktour.html">PyTango documentation</a> that a TDS will need a name (<em>ServerName</em>) and an instance (<em>Instance</em>) on which it can be called. Furthermore it needs to know which class (<em>Class</em>) inside its code is the TangoClass; this TangoClass name is usually the same as the ServerName because there usually is not more than one TangoClass active on one server. Lastly you will need to name your device (<em>Instance/tango_device_server/1</em>) with which the client will talk to the server. The <em>tango_device_server</em> will be the file with the actual server code but without the extension (here: temp_humid), the <em>Instance</em> will be the same as the one from the Server-name and the digit in the end is just to organize possible multiple connected devices (can also be a string).<bar>
 The registration can be done via the <b>Jive</b> GUI or manually inside a python console. A test instance for the AM2315 Tango Device Server could be registered through:
 
@@ -36,7 +38,7 @@ The registration can be done via the <b>Jive</b> GUI or manually inside a python
 >>> db = tango.Database()
 >>> db.add_device(my_device)</code>
 </pre>
-## Writing the actual Tango Device Server
+## <a name="write_TDS">Writing the actual Tango Device Server</a>
 The main part of the <b>Tango Device Server</b> is made up by the <b>TangoClass</b> (here <em>TempHumid</em>). It is a python class that inherits from the <code class="code-colors inline">tango.server.Device</code> class. One important method the TangoClass inherits is the <em>init_device</em> method. It initializes an object for the class itself (<code class="code-colors inline">Device.init_device(self)</code>) and one as an object of the AM2320 driver class (<code class ="code-colors inline">self.am2315=am_driver.AM2315</code>). These initializations are run inside a try-except environment so that an error can be thrown if the connection of computer and sensor is faulty.  
 
 Furthermore, the <b>attributes</b> are defined
@@ -55,7 +57,7 @@ Furthermore, there are some additional logging operators that can make the debug
     
 Lastly, the <code class ="code-colors inline">run.server()</code> method, inherited from the <code class="code-colors inline">tango.server.Device</code> class, will be executed to start the whole Server process.  
     
-## Running the TangoDS
+## <a name="run_TDS"> Running the TangoDS</a>
 
 To get the TangoDS running, make sure you are connected to your main Tango database as described above and also make sure that the Server file (here temp_humid.py) is made an executable. Now navigate to where the file is located and run
 <pre>
