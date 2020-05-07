@@ -9,9 +9,8 @@
 
 """
 
-import numpy
-from tango import AttrWriteType, DevState, ErrorIt, FatalIt
-from tango import LogIt, DebugIt, InfoIt, WarnIt
+
+from tango import AttrWriteType, DevState, ErrorIt, DebugIt
 from tango.server import Device, attribute, command
 import adafruit_am2320 as am_driver
 
