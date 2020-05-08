@@ -24,6 +24,8 @@ To give your Raspi (or other) access to the main data base you have to change tw
     <li>~/.profile – paste the following at the end of the file: "export TANGO_HOST=my_tango_host"</li>
 </ul>
 
+A Tango Device Server can also be run on the Raspi <a href="https://tango-controls.readthedocs.io/en/latest/administration/deployment/without-sql-db.html">without a database</a>. Some Tango features will be lost but you will be able to develop on your Raspi standalone and will not be in need of a connection to a Tango DB.
+
 ### <a name="register_TDS">Registering TangoDS</a>
 You will probably know from the <a href="https://pytango.readthedocs.io/en/stable/quicktour.html">PyTango documentation</a> that a TDS will need a name (<em>ServerName</em>) and an instance (<em>Instance</em>) on which it can be called. Furthermore it needs to know which class (<em>Class</em>) inside its code is the TangoClass; this TangoClass name is usually the same as the ServerName because there usually is not more than one TangoClass active on one server. Lastly you will need to name your device (<em>Instance/tango_device_server/1</em>) with which the client will talk to the server. The <em>tango_device_server</em> will be the file with the actual server code but without the extension (here: temp_humid), the <em>Instance</em> will be the same as the one from the Server-name and the digit in the end is just to organize possible multiple connected devices (can also be a string).<bar>
 The registration can be done via the <b>Jive</b> GUI or manually inside a python console. A test instance for the AM2315 Tango Device Server could be registered through:
