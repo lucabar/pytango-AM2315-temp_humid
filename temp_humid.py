@@ -12,6 +12,7 @@ from tango import LogIt, DebugIt, InfoIt, WarnIt
 from tango.server import Device, attribute, command
 import AM2315 as am_driver
 
+
 class TempHumid(Device):
 
     temperature = attribute(name='Temperature',access=AttrWriteType.READ,
