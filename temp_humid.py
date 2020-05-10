@@ -11,17 +11,14 @@ from tango import AttrWriteType, DevState, ErrorIt, FatalIt
 from tango import LogIt, DebugIt, InfoIt, WarnIt
 from tango.server import Device, attribute, command
 import AM2315 as am_driver
+
 class TempHumid(Device):
 
     temperature = attribute(name='Temperature',access=AttrWriteType.READ,
                             dtype=float,fget='get_temperature',format='.2f',
-                            min_value=-273.15,doc='the measured temperature')
                             min_value=-273.15,doc='the measured temperature',unit='°C')
 
-    humidity = attribute(name='Humidity',access=AttrWriteType.READ
-                         ,dtype=float,fget='get_humidity',format='.2f',
-                         doc='the measured humidity')
-                         doc='the measured humidity',unit='%')
+    humidity = attribute(name='Humidity',access=AttrWriteType.READ,dtype=float,fget='get_humidity',format='.2f',doc='the measured humidity',unit='%')
 
     def init_device(self):
         self.info_stream('Trying to connect device to server.')
