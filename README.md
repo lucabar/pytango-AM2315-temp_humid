@@ -4,14 +4,15 @@ Content: <a href="#install_driver">Installing AM2315 driver</a>, <a href="#regis
 This repository holds a Tango Device Server for the <a href = "https://www.adafruit.com/products/1293">AM2315 temperature and humidity sensor</a> and a quick tutorial on how it was written and what will be needed to get the Server running. I am working on a Raspberry Pi 4 with PyTango 9.2.5 (without database) but this tutorial should work with any hardware supporting an i2c bus. How to hook up the AM2315 to a Rapsi or another Arduino is shown <a href="https://cdn-learn.adafruit.com/downloads/pdf/am2315-encased-i2c-temperature-humidity-sensor.pdf?timestamp=1588759334">here</a>.  
 
 ## <a name="install_driver">Installing AM2315 driver</a>
-Start by installing the <a href="https://github.com/adafruit/Adafruit_Blinka">Adafruit_Blinka library</a> that enables CircuitPython support and the <a href="https://github.com/adafruit/Adafruit_CircuitPython_AM2320">Adafruit CircuitPython AM2320 library</a> (there is so far only a C++ library for the AM23<b>15</b> whereas the AM23<b>20</b> Python library works just as well for our AM2315):
-
+Start by installing the <a href="https://github.com/adafruit/Adafruit_Python_GPIO">Adafruit_GPIO library</a> via
 <pre>
-<code>$ pip3 install adafruit-blinka
-$ pip3 install adafruit-circuitpython-am2320</code>
+<code>$ pip3 install adafruit-gpio</code>
 </pre>
 
-Now you should be able to <code class="code-colors inline">import adafruit_am2320</code> in a python prompt and test the driver.
+You will see that the mentioned github repository is deprecated, but you can still download the library. Unfortunately there is no maintained python driver for the AM2315 sensor so that I uploaded the driver <code color="code-colors inline">AM2315.py</code> from <a href="https://www.switchdoc.com/">SwitchDoc Labs</a> that can be used but will not be maintained.
+
+Either keep the driver in the same directory as the TangoDS or move it to your python site-/dist-packages.
+Now you should be able to <code class="code-colors inline">import AM2315</code> in a python prompt and test the driver.
 
 ## Registering the TangoDS and connecting databases
 Because you will want to run and debug your Server while writing it, you first need to register it with the Tango Database. To register it on your hardware (here a Raspi), you have to point your TANGO_HOST-name to the database address on your main computer where the Tango database is installed. In case you have already done that you can skip the next abstract.
@@ -41,7 +42,7 @@ The registration can be done via the <b>Jive</b> GUI or manually inside a python
 >>> db.add_device(my_device)</code>
 </pre>
 ## <a name="write_TDS">Writing the actual Tango Device Server</a>
-The main part of the <b>Tango Device Server</b> is made up by the <b>TangoClass</b> (here <em>TempHumid</em>). It is a python class that inherits from the <code class="code-colors inline">tango.server.Device</code> class. One important method the TangoClass inherits is the <em>init_device</em> method. It initializes an object for the class itself (<code class="code-colors inline">Device.init_device(self)</code>) and one as an object of the AM2320 driver class (<code class ="code-colors inline">self.am2315=am_driver.AM2315</code>). These initializations are run inside a try-except environment so that an error can be thrown if the connection of computer and sensor is faulty.  
+The main part of the <b>Tango Device Server</b> is made up by the <b>TangoClass</b> (here <em>TempHumid</em>). It is a python class that inherits from the <code class="code-colors inline">tango.server.Device</code> class. One important method the TangoClass inherits is the <em>init_device</em> method. It initializes an object for the class itself (<code class="code-colors inline">Device.init_device(self)</code>) and one as an object of the AM2315 driver class (<code class ="code-colors inline">self.am2315=am_driver.AM2315()</code>). These initializations are run inside a try-except environment so that an error can be thrown if the connection of computer and sensor is faulty.  
 
 Furthermore, the <b>attributes</b> are defined
 <pre>
@@ -51,11 +52,11 @@ self.humid = 0</code>
 These attributes will later get changed by commands and then called up by a client (Jive, python console etc.).
 An attribute has <b>attribute properties</b> such as a <em>name, unit, dtype, doc</em> and many more. These properties help both the Server and the User understand the attribute in question and even set warning/alarm limits.  
 
-Next there are <b>commands</b> that can be executed by the clients. Here we have three important ones. <code class="code-colors inline">get_data</code>: Getting the temperature and humidity of the AM2320 object (<em>self.am2315</em>) and then saving this object's temperature and humidity as the one of the TangoClass object (<em>self.temp/self.humid</em>) itself. Up until now there is no output, we are just getting values from the AM2315 sensor with which we are updating the TempHumid-attributes <em>self.temp</em> and <em>self.humid</em>. The <em>get_data</em> command is only being executed when a client asks for it. It could also be executed regularly (<em>polling</em>, see PyTango documentation) to be independent of the client requests. How often is being measured can be controlled thorugh <em>polling</em> (PyTango documentation).  
+Next there are <b>commands</b> that can be executed by the clients. Here we have three important ones. <code class="code-colors inline">get_data</code>: Getting the temperature and humidity of the AM2315 object (<em>self.am2315</em>) and then saving this object's temperature and humidity as the one of the TangoClass object (<em>self.temp/self.humid</em>) itself. Up until now there is no output, we are just getting values from the AM2315 sensor with which we are updating the TempHumid-attributes <em>self.temp</em> and <em>self.humid</em>. The <em>get_data</em> command is only being executed when a client asks for it. It can also be executed regularly (<a href="https://pytango.readthedocs.io/en/stable/server_api/server.html#tango.server.command">command polling</a>, see PyTango documentation) to be independent of the client requests. How often is being measured can be controlled thorugh <em>polling</em> (PyTango documentation).  
     
 When a client asks for the temperature or humidity, the <code class="code-colors inline">get_temperature, get_humidity</code> commands are executed. They return the value that is currently saved as the attribute <em>temperature</em>. Usually naming methods is up to the coder but in the case of a TangoClass it is important that for each attribute there is one method that can <b>read</b> the attribute. To ensure this, the reading method has to be called <em>read_attribute(self)</em> (here <em>read_temperature</em>) or when named otherwise, be specified by the attribute property <em>fget</em>.  
     
-Furthermore, there are some additional logging operators that can make the debugging and error handling easier. They decide which command will be documented in the output and whether input, output or arguments will be returned. When running the Server, the debugging level can be specified by adding <code class="code-colors inline">-v1</code> (or 2,3,4 respectively, 4 being the debug and 1 the fatal error level) at the end of the line. The <em>tango.am2315_service</em> file in this repository in turn regulates where the output will be stored (using journalctl).  
+Furthermore, there are some additional logging operators that can make the debugging and error handling easier. They decide which command will be documented in the output and whether input, output or arguments will be returned. When running the Server, the <a href="http://www.esrf.eu/computing/cs/tango/pytango/v920/server_api/logging.html">debugging level</a> can be specified by adding <code class="code-colors inline">-v4</code> (or 1,2,3 respectively, 4 being the debug and 1 the fatal error level) at the end of the line. The <em>tango.am2315_service</em> file in this repository in turn regulates where the output will be stored (using journalctl).  
     
 Lastly, the <code class ="code-colors inline">run.server()</code> method, inherited from the <code class="code-colors inline">tango.server.Device</code> class, will be executed to start the whole Server process.  
     
@@ -63,7 +64,7 @@ Lastly, the <code class ="code-colors inline">run.server()</code> method, inheri
 
 To get the TangoDS running, make sure you are connected to your main Tango database as described above and also make sure that the Server file (here temp_humid.py) is made an executable. Now navigate to where the file is located and run
 <pre>
-<code>python3 TempHumid.py test -v4</code>
+<code>python3 temp_humid.py test -v3</code>
 </pre>
 The argument <em>test</em> here is the name of the <em>Instance</em> given to the Server in a chapter above. It should return
 <pre>
