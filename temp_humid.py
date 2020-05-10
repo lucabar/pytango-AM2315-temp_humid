@@ -38,7 +38,6 @@ class TempHumid(Device):
         try:
             #_read_data measures both humidity and temperature
             self.am2315._read_data()
-            self.debug_stream(self.am2315.temperature)
             self.temp = self.am2315.temperature
             self.humid = self.am2315.humidity
         except:
