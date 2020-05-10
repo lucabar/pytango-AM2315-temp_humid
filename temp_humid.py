@@ -7,8 +7,7 @@
     @author: mbi
 """
 import numpy
-from tango import AttrWriteType, DevState, ErrorIt, FatalIt
-from tango import LogIt, DebugIt, InfoIt, WarnIt
+from tango import AttrWriteType, DevState, DebugIt, ErrorIt
 from tango.server import Device, attribute, command
 import AM2315 as am_driver
 
@@ -16,7 +15,7 @@ class TempHumid(Device):
 
     temperature = attribute(name='Temperature',access=AttrWriteType.READ,
                             dtype=float,fget='get_temperature',format='.2f',
-                            min_value=-273.15,doc='the measured temperature',unit='°C')
+                            min_value=-273.15,doc='the measured temperature',unit='C')
 
     humidity = attribute(name='Humidity',access=AttrWriteType.READ,dtype=float,fget='get_humidity',format='.2f',doc='the measured humidity',unit='%')
 
@@ -29,25 +28,27 @@ class TempHumid(Device):
             self.temp = 0
             self.humid = 0
             self.info_stream("Connection established.")
-            
         except:
             self.error_stream('Connection could not be established.')
-        
-    @DebugIt()            
+
+    @DebugIt()
     @command()
     def get_data(self):
-        #_read_data measures both humidity and temperature
-        self.am2315._read_data()
-        self.temp = self.am2315.temperature
-        self.humid = self.am2315.humidity
-        
-    @DebugIt(show_ret=True)               
+        try:
+            #_read_data measures both humidity and temperature
+            self.am2315._read_data()
+            self.debug_stream(self.am2315.temperature)
+            self.temp = self.am2315.temperature
+            self.humid = self.am2315.humidity
+        except:
+            self.error_stream('Data could not be read')
+    @DebugIt(show_ret=True)
     def get_temperature(self):
         return self.temp
-    
-    @DebugIt(show_ret=True)    
+
+    @DebugIt(show_ret=True)
     def get_humidity(self):
-        return self.humid   
+        return self.humid
     
     @ErrorIt()
     @command()
