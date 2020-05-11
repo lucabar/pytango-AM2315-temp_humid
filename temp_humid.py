@@ -7,7 +7,7 @@
     @author: mbi
 """
 import numpy
-from tango import AttrWriteType, DevState, DebugIt, ErrorIt
+from tango import AttrWriteType, DevState, DebugIt, ErrorIt, InfoIt
 from tango.server import Device, attribute, command
 import AM2315 as am_driver
 
@@ -42,11 +42,11 @@ class TempHumid(Device):
             self.humid = self.am2315.humidity
         except:
             self.error_stream('Data could not be read')
-    @DebugIt(show_ret=True)
+    @InfoIt(show_ret=True)
     def get_temperature(self):
         return self.temp
 
-    @DebugIt(show_ret=True)
+    @InfoIt(show_ret=True)
     def get_humidity(self):
         return self.humid
     
