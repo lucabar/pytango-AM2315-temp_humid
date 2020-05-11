@@ -9,7 +9,7 @@ Start by installing the <a href="https://github.com/adafruit/Adafruit_Python_GPI
 <code>$ pip3 install adafruit-gpio</code>
 </pre>
 
-You will see that the mentioned github repository is deprecated, but you can still download the library. Unfortunately there is no maintained python driver for the AM2315 sensor so that I uploaded the driver <code color="code-colors inline">AM2315.py</code> from <a href="https://www.switchdoc.com/">SwitchDoc Labs</a> that can be used but will not be maintained.
+You will see that the mentioned github repository is deprecated, but you can still download the library. Adafruit suggests to use the AM2320 driver instead but as I have tried it, I learned that the AM2315 does not work with the AM2320 driver (see <a href="https://github.com/adafruit/Adafruit_CircuitPython_AM2320/issues/17">issue</a>). Unfortunately there is no maintained python driver for the AM2315 sensor so that I uploaded the driver <code color="code-colors inline">AM2315.py</code> from <a href="https://www.switchdoc.com/">SwitchDoc Labs</a> that can be used but will not be maintained.
 
 Either keep the driver in the same directory as the TangoDS or move it to your python site-/dist-packages.
 Now you should be able to <code class="code-colors inline">import AM2315</code> in a python prompt and test the driver.
