@@ -18,11 +18,12 @@ Now you should be able to <code class="code-colors inline">import AM2315</code> 
 Because you will want to run and debug your Server while writing it, you first need to register it with the Tango Database. To register it on your hardware (here a Raspi), you have to point your TANGO_HOST-name to the database address on your main computer where the Tango database is installed. In case you have already done that you can skip the next abstract.
 
 ### <a name="connect_db">Pointing to the main database</a>
-To give your Raspi (or other) access to the main data base you have to change two files:
+To give your Raspi (or other) access to the main data base you have to change three files:
 
 <ul type="circle">
     <li>/etc/tangorc – change <em>TANGO_HOST=some_tango_host</em> to the database address from the main computer (let's say <em>my_tango_host</em>). If you do not know that address, run <code class ="code-colors inline">$echo $TANGO_HOST</code> on your database computer and you will get <em>my_tango_host</em>.</li>
     <li>~/.profile – paste the following at the end of the file: "export TANGO_HOST=my_tango_host"</li>
+    <li>/etc/hosts - at the end add your main computer's IP followed by the TANGO_HOST-name, e.g. "192.168.2.114 my_tango_host"</li> so the Pi knows at what IP to reach the database.
 </ul>
 
 A Tango Device Server can also be run on the Raspi <a href="https://tango-controls.readthedocs.io/en/latest/administration/deployment/without-sql-db.html">without a database</a>. Some Tango features will be lost but you will be able to develop on your Raspi standalone and will not be in need of a connection to a Tango DB.
