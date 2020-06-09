@@ -36,7 +36,7 @@ The registration can be done via the <b>Jive</b> GUI or manually inside a python
 <code>>>> import tango
 >>> my_device = tango.DbDevInfo()
 >>> my_device.server = "TempHumid/test"
->>> my_device.class = "TempHumid"
+>>> my_device._class = "TempHumid"
 >>> my_device.name = "test/temp_humid/1"
 
 >>> db = tango.Database()
